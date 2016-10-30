@@ -135,8 +135,10 @@ reboot:
     call initFilesystem
     call initMultitasking
     call initDisplay
+#ifndef PICO80
     call initIO
-
+#endif
+    
     ld de, init
     call fileExists
     ld a, panic_init_not_found

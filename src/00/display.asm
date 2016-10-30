@@ -1,3 +1,4 @@
+#ifndef PICO80
 #ifndef COLOR
 initDisplay:
     ; Initialize LCD
@@ -37,6 +38,7 @@ initDisplay:
     out (PORT_LCD_CMD), a ; Contrast
     ret
 #endif
+#endif
 
 ;; clearBuffer [Display]
 ;;  Turns off all pixels on a screen buffer.
@@ -58,6 +60,7 @@ clearBuffer:
     pop hl
     ret
 
+#ifndef PICO80 ; Pico80 Color fastCopy is implemented in display_pico.asm
 #ifndef COLOR ; Color fastCopy is implemented in display_color.asm
 ;; fastCopy [Display]
 ;;  Copies the screen buffer to the LCD.
@@ -67,8 +70,8 @@ clearBuffer:
 ;;  This routine will return immediately without drawing to the LCD if the calling thead does not have an
 ;;  LCD lock. Acquire one with [[getLcdLock]].
 ;;  
-;;  On a TI-84+ CSE, this routine will draw the 96x64 monochrome buffer (the "legacy" buffer) to the LCD.
-;;  The LCD should be set to legacy mode (see [[setLegacyLcdMode]]).
+;;  On Pico-80 and a TI-84+ CSE, this routine will draw the 96x64 monochrome buffer (the "legacy" buffer) to the LCD.
+;;  On a TI-84+ CSE the LCD should be set to legacy mode (see [[setLegacyLcdMode]]).
 fastCopy:
         call hasLCDLock
         ret nz
@@ -120,6 +123,7 @@ _:  pop de
     pop bc
     pop hl
     ret
+#endif
 #endif
     
 ;; putSpriteXOR [Display]

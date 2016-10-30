@@ -40,6 +40,7 @@ drawHexHL   .equ 0x0E01
 
 #include "display.asm"
 #include "display-color.asm"
+#include "display-pico.asm"
 #include "keyboard.asm"
 #include "link.asm"
 

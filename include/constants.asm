@@ -22,8 +22,11 @@
 
     PORT_SCRN_CMD       .equ 6
     PORT_SCRN_ARG0      .equ 7
+    PORT_SCRN_COL       .equ 7
     PORT_SCRN_ARG1      .equ 8
+    PORT_SCRN_X         .equ 8
     PORT_SCRN_ARG2      .equ 9
+    PORT_SCRN_Y         .equ 9
     
         SRCN_CMD_SYNC       .equ 0
         SRCN_CMD_CLEAR      .equ 1

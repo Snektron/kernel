@@ -1,3 +1,4 @@
+#ifndef PICO80
 ; Machine IDs
 
 #define TIMEOUT_SECS 1
@@ -480,3 +481,5 @@ handle_internal_packets:
         ld bc, (io_tx_header + 2)
         push af \ push bc
         jp checks_pass@ioSendPacket
+#endif
+

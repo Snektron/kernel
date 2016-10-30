@@ -17,10 +17,6 @@ writeLcdRegister:
 clipColorRectangle:
 setLcdWindow:
 fullScreenWindow:
-    or 1
-    ld a, errUnsupported
-    ret
-
 colorSupported:
     or 1
     ld a, errUnsupported
