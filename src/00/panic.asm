@@ -12,6 +12,7 @@ panic:
         call clearColorLcd
         call setLegacyLcdMode
     #else
+	#ifndef PICO80
         ; Reset the screen to a usable state
         ld a, 1 + LCD_CMD_AUTOINCDEC_SETX
         call lcdDelay
@@ -28,6 +29,7 @@ panic:
         ld a, 3 + LCD_CMD_POWERSUPPLY_SETENHANCEMENT
         call lcdDelay
         out (PORT_LCD_CMD), a
+	#endif
     #endif
     pop af
 

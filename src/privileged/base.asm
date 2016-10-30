@@ -4,6 +4,7 @@
 
     rst 0 ; Crash before runaway code breaks things
 
+#ifndef PICO80
 jp _unlockFlash
 jp _lockFlash
 
@@ -40,3 +41,4 @@ _:  push af
     ret po
     ei
     ret
+#endif

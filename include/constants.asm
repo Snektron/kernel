@@ -10,21 +10,31 @@
     PORT_BANKA          .equ 1
     PORT_BANKB          .equ 2
     PORT_BANKC          .equ 3
+    define_mask(BANKA_ISRAM_CPU15, 7)
+    define_mask(BANKB_ISRAM_CPU15, 7)
+    define_mask(BANKC_ISRAM_CPU15, 7)
 
     PORT_INT_MASK       .equ 4
-    PORT_INT_ACK        .equ 5
+    define_mask(INT_TIMER1, 0)
+
     PORT_INT_TRIG       .equ 5
-    define_mask(INT_TIMER, 0)
+    define_mask(INT_TRIG_TIMER1, 0)
 
     PORT_SCRN_CMD       .equ 6
     PORT_SCRN_ARG0      .equ 7
     PORT_SCRN_ARG1      .equ 8
     PORT_SCRN_ARG2      .equ 9
+    
+        SRCN_CMD_SYNC       .equ 0
+        SRCN_CMD_CLEAR      .equ 1
+        SRCN_CMD_SET_PIXEL  .equ 2
+        SRCN_CMD_GET_PIXEL  .equ 3
 
     PORT_MOUSE_X        .equ 10
     PORT_MOUSE_Y        .equ 11
     PORT_MOUSE_BTN      .equ 12
 
+    ; if 0 flash page is locked.
     PORT_STORAGE_CTRL   .equ 13
 #else
 ; Port numbers and outputs
@@ -264,6 +274,8 @@
     
     PORT_USB_MISC_EVENTS .equ 0x86
 #endif
+
+.echo PORT_BANKA
 
 #ifdef TI84pCSE
 ; LCD registers

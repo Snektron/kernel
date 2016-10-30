@@ -1,9 +1,11 @@
-#include "constants.asm"
+;this file will be included later, but it does create compile errors
+;#include "constants.asm"
 
 #ifdef PICO80
 ;#define CLOCK TODO should be defined in the future
-swapSector .equ 0x7D
-fatStart .equ 0x7C
+#define CPU15
+swapSector .equ 0x78
+fatStart .equ 0x77
 privledgedPage .equ 0x7E
 bootPage .equ 0x7F
 #endif
@@ -108,6 +110,20 @@ bootPage .equ 0xFF
     .macro getBankB()
         in a, (PORT_BANKB)
     .endmacro
+#ifdef PICO80
+    .macro setBankC()
+        out (PORT_BANKC), a
+    .endmacro
+
+    .macro setBankC(page)
+        ld a, page
+        out (PORT_BANKC), a
+    .endmacro
+
+    .macro getBankC()
+        in a, (PORT_BANKC)
+    .endmacro
+#endif 
 #else
     .macro setBankA()
         call color_pageBankA

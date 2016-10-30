@@ -8,9 +8,9 @@ OUTDIR=bin/
 
 # Platforms:
 # Variables (all in hex):
-#	PRIVILEGED: The address of the privileged page
-#	BOOT: The address of the boot page
-#	LENGTH: The length of the final ROM file
+#   PRIVILEGED: The address of the privileged page
+#   BOOT: The address of the boot page
+#   LENGTH: The length of the final ROM file
 
 PICO80: PLATFORM := PICO80
 PICO80: PRIVILEGED := 1F8000

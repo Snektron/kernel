@@ -9,6 +9,16 @@
 ;;  Please call [[lockFlash]] when you finish what you're doing and don't spend too
 ;;  much time with Flash unlocked. Disable interrupts while Flash is unlocked.
 unlockFlash:
+#ifdef PICO80
+    push af
+        ld a, 1
+        ; write a non-zero to PORT_STORAGE_CTRL to unlock flash
+        ; warning: this will allow writing with normal loads to
+        ; flash!
+        out (PORT_STORAGE_CTRL), a
+    pop af
+    ret
+#else
     push af
     push bc
         getBankA
@@ -22,10 +32,19 @@ unlockFlash:
     pop bc
     pop af
     ret
+#endif
 
 ;; lockFlash [Flash]
 ;;  Locks Flash and locks protected ports.
 lockFlash:
+#ifdef PICO80
+    push af
+        xor a
+        ; write a zero to PORT_STORAGE_CTRL to lock flash
+        out (PORT_STORAGE_CTRL), a
+    pop af
+    ret
+#else
     push af
     push bc
         getBankA
@@ -39,6 +58,7 @@ lockFlash:
     pop bc
     pop af
     ret
+#endif
 
 ;; writeFlashByte [Flash]
 ;;  Writes a single byte to Flash.
@@ -48,6 +68,15 @@ lockFlash:
 ;; Notes:
 ;;  Flash must be unlocked. This can only *reset* bits of Flash.
 writeFlashByte:
+#ifdef PICO80
+    push af
+    ; Remove any bits that cannot be written
+    ; (although technically pico80 allows this)
+        and (hl) 
+        ld (hl), a
+    pop af
+    ret
+#else
 ; The procedure is thus:
 ;    0xAA -> (0xAAA)
 ;    0x55 -> (0x555)
@@ -114,6 +143,7 @@ _:  pop af
     ld (0), a
     jp .return
 .ram_end:
+#endif
 
 ;; writeFlashBuffer [Flash]
 ;;  Writes several bytes of memory to Flash
@@ -126,6 +156,27 @@ _:  pop af
 ;;  from Flash, you must load any data to be written into RAM. This
 ;;  will only *reset* bits of Flash.
 writeFlashBuffer:
+#ifdef PICO80
+    push af
+    push bc
+    push de
+    push hl
+_:
+        ld a, (hl)
+        ex de, hl
+        and (hl) ; Remove any bits that cannot be written
+        ld (hl), a
+        ex de, hl
+        dec bc
+        ld  a, b
+        or  c
+        jp nz,-_
+    pop hl
+    pop de
+    pop bc
+    pop af
+    ret
+#else
     push hl
     push bc
     push de
@@ -195,6 +246,7 @@ _:  pop af
     jr nz, .loop
     jp .return
 .ram_end:
+#endif
 
 ;; eraseSwapSector [Flash]
 ;;  Erases the swap sector.
@@ -215,6 +267,19 @@ eraseSwapSector:
 ;; Notes:
 ;;  Flash must be unlocked.
 eraseFlashSector:
+#ifdef PICO80
+    push af
+        and 0b11111100
+        call eraseFlashPage
+        inc a
+        call eraseFlashPage
+        inc a
+        call eraseFlashPage
+        inc a
+        call eraseFlashPage
+    pop af
+    ret
+#else
     push bc
     ld b, a
     push af
@@ -267,6 +332,7 @@ _:  ld a, (0)
     ld (0x4000), a
     jp .return
 .ram_end:
+#endif
 
 ;; eraseFlashPage [Flash]
 ;;  Erases a single page of Flash.
@@ -277,6 +343,30 @@ _:  ld a, (0)
 ;;  may want to consider handling this logic yourself if you have to
 ;;  erase more than one page in a single sector
 eraseFlashPage:
+#ifdef PICO80
+    push af
+    push bc
+    push de
+    push hl
+        ld b, a
+        getBankA
+        push af
+            ld a, b
+            setBankA
+            ld hl, 0x4000
+            ld de, 0x4001
+            ld bc, 0x3FFF
+            ld a, 0xFF
+            ld (hl), a
+            ldir
+        pop af
+        setBankA
+    pop hl
+    pop de
+    pop bc
+    pop af
+    ret
+#else
     push af
     push bc
         push af
@@ -309,6 +399,7 @@ _:
     pop bc
     pop af
     ret
+#endif
 
 ;; copySectorToSwap [Flash]
 ;;  Copies a single sector of Flash to the swap sector.
@@ -317,8 +408,52 @@ _:
 ;; Notes:
 ;;  Flash must be unlocked.
 copySectorToSwap:
-    call eraseSwapSector
+#ifdef PICO80
+    push af
+    push bc
+    push hl
+    push de
+        and 0b11111100
+        ld b, a
+        getBankA
+        push af
+        getBankB
+        push af
+            ld a, swapSector
+            call .copyPage
+            inc b
+            ld a, swapSector + 1
+            call .copyPage
+            inc b
+            ld a, swapSector + 2
+            call .copyPage
+            inc b
+            ld a, swapSector + 3
+            call .copyPage
+        pop af
+        setBankB
+        pop af
+        setBankA
+    pop de
+    pop hl
+    pop bc
+    pop af
+    ret
 
+; small page copy routine
+; B: source page
+; A: destination page
+.copyPage:
+    setBankB
+    ld a, b
+    setBankA
+    ld hl, 0x4000
+    ld de, 0x8000
+    ld bc, 0x4000
+    ldir
+    ret
+#else
+    call eraseSwapSector
     push bc
     ld b, a
     push af
@@ -488,6 +623,7 @@ _:  pop af
     jp .return
 .ram_end:
 #endif
+#endif
 
 ;; copyFlashExcept [Flash]
 ;;  Copies one Flash page to another, but omits a certain range of bytes in increments of
@@ -503,6 +639,39 @@ _:  pop af
 ;;  If you want to copy all but 0x6000 to 0x6500, set HL to 0x6065.
 copyFlashExcept:
     ; Note: If we ever get short on space on page 0, we can merge this with copyFlashPage
+#ifdef PICO80
+    push af
+    push bc
+    push hl
+        ld c, a
+        getBankA
+        push af
+        getBankB
+        push af
+            ld a, c
+            setBankB
+            ld a, b
+            setBankA
+            ld b, h
+            ld c, 0
+            ld a, l
+            ld hl, 0x4000
+            ld de, 0x8000
+            ldir
+            ld b, a
+            ld c, 0
+            ld hl, 0x4000
+            ld de, 0x8000
+            ldir
+        pop af
+        setBankB
+        pop af
+        setBankA
+    pop hl
+    pop bc
+    pop af
+    ret
+#else
     push de
     push bc
     ld d, a
@@ -690,6 +859,7 @@ _:  inc hl
     jr .continue_loop
 .ram_end:
 #endif
+#endif
 
 ;; copyFlashPage [Flash]
 ;;  Copies one page of Flash to another.
@@ -699,6 +869,34 @@ _:  inc hl
 ;; Notes:
 ;;  Flash must be unlocked and the desination page must be cleared.
 copyFlashPage:
+#ifdef PICO80
+    push af
+    push bc
+    push hl
+    push de
+        ld c, a
+        getBankA
+        push af
+        getBankB
+        push af
+            ld a, c
+            setBankB
+            ld a, b
+            setBankA
+            ld hl, 0x4000
+            ld de, 0x8000
+            ld bc, 0x4000
+            ldir
+        pop af
+        setBankB
+        pop af
+        setBankA
+    pop de
+    pop hl
+    pop bc
+    pop af
+    ret
+#else
     push de
     push bc
     ld d, a
@@ -841,3 +1039,5 @@ _:  inc hl
     jp .return
 .ram_end:
 #endif
+#endif
+
