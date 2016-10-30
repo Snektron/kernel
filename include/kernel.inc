@@ -98,7 +98,7 @@ rpcall .equ 0x20
 .endmacro
 ; /Macros
 
-; Keypad codes
+; Keypad codes TODO add Pico80 keycodes
 kDown               .equ 0x01
 kLeft               .equ 0x02
 kRight              .equ 0x03

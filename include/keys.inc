@@ -1,4 +1,5 @@
 ; Equates for keyboard routines in the kernel
+; TODO Pico80 key equates
 
 kDown          .equ 0x01
 kLeft          .equ 0x02

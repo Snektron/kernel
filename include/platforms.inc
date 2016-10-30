@@ -1,3 +1,13 @@
+#include "constants.asm"
+
+#ifdef PICO80
+;#define CLOCK TODO should be defined in the future
+swapSector .equ 0x7D
+fatStart .equ 0x7C
+privledgedPage .equ 0x7E
+bootPage .equ 0x7F
+#endif
+
 #ifdef TI73
 #define LINK_ASSIST_RO
 swapSector .equ 0x18
@@ -74,29 +84,29 @@ bootPage .equ 0xFF
 
 #ifndef FLASH4MB
     .macro setBankA()
-        out (6), a
+        out (PORT_BANKA), a
     .endmacro
 
     .macro setBankA(page)
         ld a, page
-        out (6), a
+        out (PORT_BANKA), a
     .endmacro
 
     .macro getBankA()
-        in a, (6)
+        in a, (PORT_BANKA)
     .endmacro
 
     .macro setBankB()
-        out (7), a
+        out (PORT_BANKB), a
     .endmacro
 
     .macro setBankB(page)
         ld a, page
-        out (7), a
+        out (PORT_BANKB), a
     .endmacro
 
     .macro getBankB()
-        in a, (7)
+        in a, (PORT_BANKB)
     .endmacro
 #else
     .macro setBankA()
@@ -108,13 +118,13 @@ bootPage .equ 0xFF
             ld a, 1
             out (0x0E), a
             ld a, page & 0x7F
-            out (6), a
+            out (PORT_BANKA), a
             ld a, page
         .else
             xor a
             out (0x0E), a
             ld a, page & 0x7F
-            out (6), a
+            out (PORT_BANKA), a
         .endif
     .endmacro
 
@@ -123,7 +133,7 @@ bootPage .equ 0xFF
             in a, (0x0E)
             ld c, a
             rrc c
-            in a, (6)
+            in a, (PORT_BANKA)
             or c
         pop bc
     .endmacro
@@ -137,13 +147,13 @@ bootPage .equ 0xFF
             ld a, 1
             out (0x0F), a
             ld a, page & 0x7F
-            out (7), a
+            out (PORT_BANKB), a
             ld a, page
         .else
             xor a
             out (0x0F), a
             ld a, page & 0x7F
-            out (7), a
+            out (PORT_BANKB), a
         .endif
     .endmacro
 
@@ -152,7 +162,7 @@ bootPage .equ 0xFF
             in a, (0x0F)
             ld c, a
             rrc c
-            in a, (7)
+            in a, (PORT_BANKB)
             or c
         pop bc
     .endmacro

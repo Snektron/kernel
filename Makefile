@@ -72,18 +72,17 @@ TI84pCSE: BOOT := 3FC000
 TI84pCSE: LENGTH := 0x400000
 TI84pCSE: tirom $(OUTDIR)
 
-DEFINES=--define $(PLATFORM),TI84pSE
+DEFINES=--define $(PLATFORM)
 BINDIR=$(OUTDIR)$(PLATFORM)/
 INCLUDE=include/;$(BINDIR)
 
 .PHONY: clean kernel baserom kernel-headers \
-	TI73 TI83p TI83pSE TI84p TI84pSE TI84pCSE
+	PICO80 TI73 TI83p TI83pSE TI84p TI84pSE TI84pCSE
 
 run: $(PLATFORM)
 	$(EMU) $(BINDIR)kernel.rom
 
-#to keep eclipse quiet
-all:
+all: $(PLATFORM)
 
 tirom: kernel
 	# Generate kernel upgrade file

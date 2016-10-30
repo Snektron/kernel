@@ -4,6 +4,29 @@
     name .equ 1 << bitN
 .endmacro
 
+#ifdef PICO80
+    PORT_LOG_OUT        .equ 0
+
+    PORT_BANKA          .equ 1
+    PORT_BANKB          .equ 2
+    PORT_BANKC          .equ 3
+
+    PORT_INT_MASK       .equ 4
+    PORT_INT_ACK        .equ 5
+    PORT_INT_TRIG       .equ 5
+    define_mask(INT_TIMER, 0)
+
+    PORT_SCRN_CMD       .equ 6
+    PORT_SCRN_ARG0      .equ 7
+    PORT_SCRN_ARG1      .equ 8
+    PORT_SCRN_ARG2      .equ 9
+
+    PORT_MOUSE_X        .equ 10
+    PORT_MOUSE_Y        .equ 11
+    PORT_MOUSE_BTN      .equ 12
+
+    PORT_STORAGE_CTRL   .equ 13
+#else
 ; Port numbers and outputs
     PORT_LINKPORT       .equ 0
         define_mask(LINKPORT_TIP, 0)
@@ -240,10 +263,12 @@
     PORT_USB_RDPIPE2    .equ 0x85
     
     PORT_USB_MISC_EVENTS .equ 0x86
-    
+#endif
+
+#ifdef TI84pCSE
 ; LCD registers
 ; TI-84+ CSE only
-    
+
     LCDREG_DRIVER_OUTPUTCONTROL1    .equ 1
     LCDREG_LCDDRIVING_CONTROL       .equ 2
     LCDREG_ENTRYMODE                .equ 3
@@ -286,14 +311,20 @@
     ; if you were wondering, this is normal
     LCDREG_PANELINTERFACECONTROL4   .equ 0x95
     LCDREG_PANELINTERFACECONTROL5   .equ 0x97
+#endif
     
 ; System constants
     DEFAULT_STACK_SIZE  .equ 20
     MONO_LCD_WIDTH      .equ 96
     MONO_LCD_HEIGHT     .equ 64
     MONO_BUF_SIZE       .equ 0x300
+#ifdef PICO80
+    COLOR_LCD_WIDTH     .equ 128
+    COLOR_LCD_HEIGHT    .equ 128
+#else
     COLOR_LCD_WIDTH     .equ 320
     COLOR_LCD_HEIGHT    .equ 240
+#endif
     LEGACY_BG_COLOR     .equ 0x4108
 
 ; KFS stuff
