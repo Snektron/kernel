@@ -46,6 +46,7 @@ supported calculator model, use the given make target:
 | TI-84+ CSE           | TI84pCSE      |
 | TI-84 Pocket.fr      | TI84p         |
 | TI-84 Plus Pocket SE | TI84pSE       |
+| Pico-80              | PICO80        |
 
 Simply run `make [target]` to build the kernel. The default target, when omitted, is `TI84pSE`. This will
 produce a kernel image in the `bin/` directory. This will also generate a `kernel.inc` file, which you

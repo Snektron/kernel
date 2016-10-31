@@ -55,7 +55,7 @@ fastCopy_skipCheck:
     push de
     push hl
         push iy \ pop hl
-        ld a, 0xF
+        xor a
         call clearScreen
         ld d, 64
         ld c, PORT_SCRN_X
@@ -63,62 +63,75 @@ fastCopy_skipCheck:
         ld a, 95
         sub d
         out (PORT_SCRN_Y), a
+        push de
         
-        ld b, 12
-        ld e, 15
+            ld b, 12
+            ld de, foregroundColor << 8 | 15
 .loopx:
-        ld a, (hl)
-        inc hl
-        
-        ;bit 7
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 6
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 5
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 4
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 3
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 2
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 1
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        ;bit 0
-        out (c), e \ inc e
-        rla
-        jp c, _
-        dec c \ out (c), 0 \ inc c
-_:
-        djnz .loopx
+            ld a, (hl)
+            inc hl
+            
+            ;bit 7
+            out (c), e \ inc e ; write X coord
+            dec c ; change command to PORT_SCRN_COL
+            rla
+            jp c, ++_
+            out (c), 0
+            jp ++_
+_:          out (c), d
+_:          inc c ; back to PORT_SCRN_X
+
+            ;bit 6
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            ;bit 5
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            ;bit 4
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            ;bit 3
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            ;bit 2
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            ;bit 1
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            ;bit 0
+            out (c), e \ inc e \ dec c
+            rla \ jp c, ++_
+            out (c), 0 \ jp ++_
+_:          out (c), d
+_:          inc c
+
+            djnz .loopx
+        pop de
         dec d
         jp nz, .loopy
         call updateScreen

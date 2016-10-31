@@ -8,6 +8,7 @@ swapSector .equ 0x78
 fatStart .equ 0x77
 privledgedPage .equ 0x7E
 bootPage .equ 0x7F
+foregroundColor .equ 0xF
 #endif
 
 #ifdef TI73
