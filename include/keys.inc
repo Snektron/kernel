@@ -52,5 +52,5 @@ kMode          .equ 0x37 \kQuite .equ 0x37
 kDel           .equ 0x38 \kIns .equ 0x38 \kDelete .equ 0x38
 
 ; aliases
-kShift         .equ 0x36
-kCtrl          .equ 0x30
+kShift         .equ 0x30
+kCtrl          .equ 0x36
