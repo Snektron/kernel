@@ -50,7 +50,6 @@ interruptResume:
 #endif
 
     bit BIT_INT_TRIG_TIMER1, a
-    .echo BIT_INT_TRIG_TIMER1
     jp nz, intHandleTimer1
 #ifndef PICO80
     bit BIT_INT_TRIG_ON, a
