@@ -51,9 +51,9 @@ interruptResume:
 
     bit BIT_INT_TRIG_TIMER1, a
     jp nz, intHandleTimer1
-#ifndef PICO80
     bit BIT_INT_TRIG_ON, a
     jp nz, intHandleON
+#ifndef PICO80
     bit BIT_INT_TRIG_TIMER2, a
     jp nz, intHandleTimer2
     bit BIT_INT_TRIG_LINK, a
@@ -70,7 +70,7 @@ interruptResume:
 #endif
 
     jr contextSwitch
-#ifndef PICO80
+
 intHandleON:
     in a, (PORT_INT_MASK)
     res BIT_INT_ON, a
@@ -80,7 +80,7 @@ intHandleON:
 
     ; Check for special keycodes
     jp handleKeyboard
-#endif
+    
 #ifdef CRYSTAL_TIMERS
 intHandleCrys2:
     ld c, PORT_CRYS2_FREQ
@@ -175,8 +175,9 @@ noActiveThreads:
     ld bc, idlethread_stack_end - idlethread_stack
     ldir
     ld sp, userMemory - (idlethread_stack_end - idlethread_stack)
-    jr sysInterruptDone
 #ifndef PICO80
+    jr sysInterruptDone
+
 intHandleTimer2:
     in a, (PORT_INT_MASK)
     res BIT_INT_TIMER2, a
@@ -185,9 +186,7 @@ intHandleTimer2:
     out (PORT_INT_MASK), a
     ; Timer 2 interrupt
     jr sysInterruptDone
-#endif
 
-#ifndef PICO80
 intHandleLink:
     in a, (PORT_INT_MASK)
     res BIT_INT_LINK, a

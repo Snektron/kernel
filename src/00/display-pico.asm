@@ -1,8 +1,8 @@
 #ifndef PICO80
 
 color16Supported:
-clearColorLcd16:
-updateLcd16:
+clearScreen:
+updateScreen:
     or 1
     ld a, errUnsupported
     ret
@@ -39,7 +39,7 @@ clearScreen:
     ret
     
 ;; updateScreen [Color]
-;;  Copies the internal screen buffer to the screen.
+;;  Copies the internal screen buffer to the screen in 16-color mode.
 updateScreen:
     ld a, SRCN_CMD_SYNC
     out (PORT_SCRN_CMD), a
@@ -130,7 +130,8 @@ _:          inc c
 _:          out (c), d
 _:          inc c
 
-            djnz .loopx
+            dec b
+            jp nz, .loopx ; out of range
         pop de
         dec d
         jp nz, .loopy

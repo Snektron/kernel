@@ -16,9 +16,11 @@
 
     PORT_INT_MASK       .equ 4
     define_mask(INT_TIMER1, 0)
+    define_mask(INT_ON, 1)
 
     PORT_INT_TRIG       .equ 5
     define_mask(INT_TRIG_TIMER1, 0)
+    define_mask(INT_TRIG_ON, 1)
 
     PORT_SCRN_CMD       .equ 6
     PORT_SCRN_ARG0      .equ 7
@@ -37,8 +39,12 @@
     PORT_MOUSE_Y        .equ 11
     PORT_MOUSE_BTN      .equ 12
 
-    ; if 0 flash page is locked.
     PORT_STORAGE_CTRL   .equ 13
+    
+    PORT_KEYBOARD       .equ 14
+    PORT_KEYPAD         .equ 15
+    PORT_KEYMOD         .equ 16
+
 #else
 ; Port numbers and outputs
     PORT_LINKPORT       .equ 0
@@ -277,8 +283,6 @@
     
     PORT_USB_MISC_EVENTS .equ 0x86
 #endif
-
-.echo PORT_BANKA
 
 #ifdef TI84pCSE
 ; LCD registers

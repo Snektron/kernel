@@ -1,4 +1,11 @@
-#ifndef PICO80
+#ifdef PICO80
+initIO:
+ioRegisterHandler:
+ioSendPacket:
+    or 1
+    ld a, errUnsupported
+    ret
+#else
 ; Machine IDs
 
 #define TIMEOUT_SECS 1
@@ -95,7 +102,7 @@ default_header_handlers_end:
 ;;
 ;;  Your header handler may be called multiple times before the final callback is
 ;;  invoked. This may occur if we have to retry the packet due to a corrupted
-;;  header.
+;;  header. This routine does nothing on Pico-80.
 ioRegisterHandler:
     push hl
     push de
@@ -148,7 +155,7 @@ ioRegisterHandler:
 ;;  or use [[condWait]] and have your callback resume/notify it.
 ;;  
 ;;  Attempts to access the buffer memory before the callback is run
-;;  will end in tears.
+;;  will end in tears. This routine does nothing on Pico-80.
 ioSendPacket:
     push bc
     push af

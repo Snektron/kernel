@@ -8,18 +8,24 @@ shutdown:
     ; TODO: Crash detection
 _:  di
 
-; No memory modes on pico80
 #ifndef PICO80
     ld a, 3 << MEM_TIMER_SPEED
     out (PORT_MEM_TIMER), a ; Memory mode 0
+#endif
     
 #ifdef FLASH4MB
     xor a
     out (PORT_MEMA_HIGH), a
     out (PORT_MEMB_HIGH), a
 #endif
-#endif
 
+#ifdef PICO80
+    ; PICO80 needs bank C set too
+    ld a, 1 | BANKB_ISRAM_CPU15
+    out (PORT_BANKB), a
+    ld a, 0 | BANKC_ISRAM_CPU15
+    out (PORT_BANKC), a
+#else
 #ifdef CPU15
     ; Set memory mapping
     ; Bank 0: Flash Page 00
@@ -28,11 +34,6 @@ _:  di
     ; Bank 3: RAM Page 00 ; In this order for consistency with TI-83+ and TI-73 mapping
     ld a, 1 | BANKB_ISRAM_CPU15
     out (PORT_BANKB), a
-#ifdef PICO80
-    ; PICO80 needs bank C set too
-    ld a, 0 | BANKC_ISRAM_CPU15
-    out (PORT_BANKC), a
-#endif
 #else
     ; Set memory mapping
     ; Bank 0: Flash Page 00
@@ -41,6 +42,7 @@ _:  di
     ; Bank 3: RAM Page 00
     ld a, 1 | BANKB_ISRAM_CPU6
     out (PORT_BANKB), a
+#endif
 #endif
 
     ld sp, kernelGarbage + kernelGarbageSize
@@ -65,16 +67,19 @@ reboot:
     out (PORT_MEM_TIMER), a
 #endif
 
+#ifdef PICO80
+    ld a, 1 | BANKB_ISRAM_CPU15
+    out (PORT_BANKB), a
+    ld a, 0 | BANKC_ISRAM_CPU15
+    out (PORT_BANKC), a
+#else
 #ifdef CPU15
     ld a, 1 | BANKB_ISRAM_CPU15
     out (PORT_BANKB), a
-#ifdef PICO80
-    ld a, 0 | BANKC_ISRAM_CPU15
-    out (PORT_BANKC), a
-#endif
 #else
     ld a, 1 | BANKB_ISRAM_CPU6
     out (PORT_BANKB), a
+#endif
 #endif
 
 #ifdef LINK_ASSIST
@@ -117,14 +122,12 @@ reboot:
     call lockFlash
 
 #ifdef CPU15
-#ifndef PICO80
     ld a, BIT_CPUSPEED_15MHZ
     out (PORT_CPUSPEED), a
 #endif
-#endif
 
 #ifdef PICO80
-    ld a, INT_TIMER1
+    ld a, INT_TIMER1 | INT_ON
 #else
     ld a, INT_ON | INT_TIMER1 | INT_LINK
 #endif

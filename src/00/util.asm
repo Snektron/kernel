@@ -3,7 +3,11 @@
 suspendDevice:
     ld a, i
     push af
- #ifdef COLOR
+#ifdef PICO80
+    xor a
+    call clearScreen
+#else
+#ifdef COLOR
     push hl
     push bc
     call checkLegacyLcdMode
@@ -14,10 +18,11 @@ suspendDevice:
 _:
     push bc
     call colorLcdOff
- #else
+#else
     ld a, LCD_CMD_SETDISPLAY
     out (PORT_LCD_CMD), a ; Disable LCD
- #endif
+#endif
+#endif
     di ; And interrupts, for now
     im 1 ; interrupt mode 1, for cleanliness
     in a, (PORT_INT_MASK)
@@ -31,7 +36,10 @@ _:
         di
     pop af
     out (PORT_INT_MASK), a
- #ifdef COLOR
+#ifdef PICO80
+    ; TODO fancy animation?
+#else
+#ifdef COLOR
     call colorLcdOn
     pop bc
     xor a
@@ -39,16 +47,18 @@ _:
     call nz, setLegacyLcdMode
     pop bc
     pop hl
- #else
+#else
     ld a, 1 + LCD_CMD_SETDISPLAY
     out (PORT_LCD_CMD), a ; Enable the screen
- #endif
+#endif
+#endif
     pop af
     ret po
     ei
     ret
 
 unprotectRAM:
+#ifndef PICO80
 #ifdef CPU15
    xor a
    out (PORT_RAMEXEC_LOWLIMIT), a ; RAM Lower Limit ; out (25), 0
@@ -64,9 +74,11 @@ unprotectRAM:
    xor a
    out (PORT_FLASHEXCLUSION), a
 #endif
+#endif
    ret
 
 unprotectFlash:
+#ifndef PICO80
 #ifdef CPU15
    ld a, 0xFF
    out (PORT_FLASHEXEC_LOWLIMIT), a ; Flash Lower Limit
@@ -81,6 +93,7 @@ unprotectFlash:
    out (PORT_RAM_PAGING), a
    xor a
    out (PORT_FLASHEXCLUSION), a
+#endif
 #endif
    ret
 
@@ -164,12 +177,16 @@ _:  sub '0' ; To number
 
 ;; lcdDelay [Hardware]
 ;;  Blocks until the LCD is ready to receive data.
+;; Notes:
+;;  This does nothing on Pico-80
 lcdDelay:
+#ifndef PICO80
     push af
 _:  in a, (PORT_LCD_CMD)
     rla
     jr c,-_
     pop af
+#endif
     ret
 
 ;; getBatteryLevel [Hardware]
@@ -180,7 +197,12 @@ _:  in a, (PORT_LCD_CMD)
 ;;  This returns a value from 0-255. The precision of this value varies by calculator
 ;;  model. 6 MHz platforms will return a 0 or a 255. 15 MHz platforms will return
 ;;  0, 63, 127, 191, or 255 (multiples of 64), where 0 is critical.
+;;  On Pico-80, this always returns 255.
 getBatteryLevel:
+#ifdef PICO80
+    ld b, 255
+    ret
+#else
 #ifdef CPU15
     in a, (0x3A)
     or 0b10000000    ; Set bit 7 of port 3A (TI-OS does this)
@@ -237,6 +259,7 @@ _:  ld a, 0x06
     jr c, _
     ld b, 255  ; Above critical threshold
 _:  ret
+#endif
 #endif
 
 ;; getBootPage [Miscellaneous]
@@ -370,6 +393,25 @@ sleep:
         di                  ; +24
         push af             ; +35
             push bc \ push hl ; +57
+#ifdef PICO80
+                ; at 50 MHz, 1 ms = 50000 T-states
+.loop:
+                ld bc, 1722  ; 10
+_:
+                dec bc      ; 6
+                ld  a, b    ; 15
+                or  c       ; 19
+                jp  nz, -_  ; 29
+                ; ->  10 + (6 + 9 + 4 + 10) * 1723 = 49948
+                dec hl      ; 49954
+                ld a, h     ; 49963
+                ld a, h     ; 49972
+                nop         ; 49976
+                jp _        ; 49986
+_:
+                or l        ; 49990
+                jr nz, .loop  ; 50000                
+#else
 #ifdef CPU15
 _:
                 ; at 15 MHz, 1 ms = 15000 T-states
@@ -403,6 +445,7 @@ _:
                 or l        ; 5986
                 jr nz, -_   ; 5993/5998
 _:
+#endif
             pop hl \ pop bc ; ++20
         pop af              ; ++30
         jp po, +_           ; ++40

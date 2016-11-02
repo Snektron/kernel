@@ -3,7 +3,6 @@
 
 #ifdef PICO80
 ;#define CLOCK TODO should be defined in the future
-#define CPU15
 swapSector .equ 0x78
 fatStart .equ 0x77
 privledgedPage .equ 0x7E

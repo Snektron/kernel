@@ -2,7 +2,11 @@
 ; Dummy boot page to get emulators to boot the OS
     jr _
     .fill 0x0F - $
+#ifdef PICO80
+    .db "Pico-80", 0
+#else
     .db "Emulated", 0
+#endif
 _:
 #ifndef PICO80
 #ifdef TI84p
