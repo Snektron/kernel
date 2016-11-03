@@ -84,6 +84,9 @@ run: $(PLATFORM)
 
 all: $(PLATFORM)
 
+tirom: kernel
+	mktiupgrade -p -k keys/$(KEY).key -d $(DEVICE) $(BINDIR)kernel.rom $(BINDIR)kernel.$(UPGRADEEXT) 00 01 02 03
+
 kernel: baserom $(OUTDIR)$(PLATFORM)/00.bin $(OUTDIR)$(PLATFORM)/01.bin $(OUTDIR)$(PLATFORM)/02.bin $(OUTDIR)$(PLATFORM)/privileged.bin $(OUTDIR)$(PLATFORM)/boot.bin
 	mkrom $(BINDIR)kernel.rom $(LENGTH) \
 		$(BINDIR)00.bin:0x00 $(BINDIR)01.bin:0x4000 \
