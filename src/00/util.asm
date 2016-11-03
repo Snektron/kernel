@@ -6,6 +6,7 @@ suspendDevice:
 #ifdef PICO80
     xor a
     call clearScreen
+    call updateScreen
 #else
 #ifdef COLOR
     push hl

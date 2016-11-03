@@ -2,12 +2,12 @@
 ;#include "constants.asm"
 
 #ifdef PICO80
-;#define CLOCK TODO should be defined in the future
+#define CLOCK
 swapSector .equ 0x78
 fatStart .equ 0x77
 privledgedPage .equ 0x7E
 bootPage .equ 0x7F
-foregroundColor .equ 0xF
+foregroundColor .equ 0x0
 #endif
 
 #ifdef TI73

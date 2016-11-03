@@ -21,6 +21,11 @@ clockSupported:
 ;;    A: Preserved on success, error code on failure
 ;;    Z: Set on success, reset on failure
 setClock:
+#ifdef PICO80
+    ld a, errUnsupported
+    or a
+    ret
+#else
 #ifndef CLOCK
     ld a, errUnsupported
     or a
@@ -42,6 +47,7 @@ setClock:
     pop af
     cp a
     ret
+#endif
 #endif
 
 ;; getClock [Time]

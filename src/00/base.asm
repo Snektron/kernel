@@ -51,6 +51,10 @@ drawHexHL   .equ 0x0E01
 #include "util.asm"
 #include "concurrency.asm"
 
+#ifdef PICO80
+#include "log.asm"
+#endif
+
 .echo "Assigned kernel memory:"
 .echo "threadTable: 0x{0:X4}" threadTable
 .echo "libraryTable: 0x{0:X4}" libraryTable

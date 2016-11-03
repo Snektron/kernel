@@ -2,6 +2,7 @@
 boot:
     di
     jr _
+    
 ;; shutdown [System]
 ;;  Shuts off the device.
 shutdown:
@@ -46,15 +47,16 @@ _:  di
 #endif
 
     ld sp, kernelGarbage + kernelGarbageSize
-
+    
     call suspendDevice
+        
 ;; reboot [System]
 ;;  Restarts the device.
 reboot:
     di
 
     ld sp, kernelGarbage + kernelGarbageSize
-
+    
 #ifdef FLASH4MB
     xor a
     out (PORT_MEMA_HIGH), a
@@ -92,9 +94,11 @@ reboot:
     out (PORT_LINK_ASSIST_RX_BUFFER), a
 #endif
 
+#ifndef PICO80
 #ifdef CLOCK
     ld a, 1
     out (PORT_CLOCKCONTROL), a
+#endif
 #endif
 
 #ifdef CRYSTAL_TIMERS
@@ -120,7 +124,7 @@ reboot:
     call unprotectRAM
     call unprotectFlash
     call lockFlash
-
+    
 #ifdef CPU15
     ld a, BIT_CPUSPEED_15MHZ
     out (PORT_CPUSPEED), a
@@ -132,12 +136,13 @@ reboot:
     ld a, INT_ON | INT_TIMER1 | INT_LINK
 #endif
     out (PORT_INT_MASK), a
-
+        
     call formatMem
     call initRandom
     call initFilesystem
     call initMultitasking
     call initDisplay
+        
 #ifndef PICO80
     call initIO
 #endif
@@ -150,6 +155,6 @@ reboot:
     ld h, 0
     call setInitialA
     jp contextSwitch_manual
-
+    
 init:
     .db "/bin/init", 0

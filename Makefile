@@ -1,8 +1,8 @@
 # Makefile for KnightOS kernel
 AS=sass
 ASFLAGS=--encoding "Windows-1252"
-.DEFAULT_GOAL=TI84pSE
-PLATFORM:=TI84pSE
+.DEFAULT_GOAL=PICO80
+PLATFORM:=PICO80
 TAG:=$(shell git describe --abbrev=0)
 OUTDIR=bin/
 
@@ -80,13 +80,9 @@ INCLUDE=include/;$(BINDIR)
 	PICO80 TI73 TI83p TI83pSE TI84p TI84pSE TI84pCSE
 
 run: $(PLATFORM)
-	$(EMU) $(BINDIR)kernel.rom
+	$(EMU) $(BINDIR)kernel.rom | cat
 
 all: $(PLATFORM)
-
-tirom: kernel
-	# Generate kernel upgrade file
-	mktiupgrade -p -k keys/$(KEY).key -d $(DEVICE) $(BINDIR)kernel.rom $(BINDIR)kernel.$(UPGRADEEXT) 00 01 02 03
 
 kernel: baserom $(OUTDIR)$(PLATFORM)/00.bin $(OUTDIR)$(PLATFORM)/01.bin $(OUTDIR)$(PLATFORM)/02.bin $(OUTDIR)$(PLATFORM)/privileged.bin $(OUTDIR)$(PLATFORM)/boot.bin
 	mkrom $(BINDIR)kernel.rom $(LENGTH) \

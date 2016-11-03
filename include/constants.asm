@@ -17,14 +17,16 @@
     PORT_INT_MASK       .equ 4
     define_mask(INT_TIMER1, 0)
     define_mask(INT_ON, 1)
+    define_mask(INT_F12, 1)
 
     PORT_INT_TRIG       .equ 5
     define_mask(INT_TRIG_TIMER1, 0)
     define_mask(INT_TRIG_ON, 1)
+    define_mask(INT_TRIG_F12, 1)
 
     PORT_SCRN_CMD       .equ 6
     PORT_SCRN_ARG0      .equ 7
-    PORT_SCRN_COL       .equ 7
+    PORT_SCRN_COLOR     .equ 7
     PORT_SCRN_ARG1      .equ 8
     PORT_SCRN_X         .equ 8
     PORT_SCRN_ARG2      .equ 9
@@ -44,7 +46,11 @@
     PORT_KEYBOARD       .equ 14
     PORT_KEYPAD         .equ 15
     PORT_KEYMOD         .equ 16
-
+    
+    PORT_CLOCKREG1_OUT  .equ 17
+    PORT_CLOCKREG2_OUT  .equ 18
+    PORT_CLOCKREG3_OUT  .equ 19
+    PORT_CLOCKREG4_OUT  .equ 20
 #else
 ; Port numbers and outputs
     PORT_LINKPORT       .equ 0

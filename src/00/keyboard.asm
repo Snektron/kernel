@@ -23,6 +23,12 @@ flushkeys:
     ret nz
 flushkeys_skipCheck:
     push af
+#ifdef PICO80
+_:
+        in a, (PORT_KEYPAD)
+        or a
+        jp nz, -_
+#else
     push bc
     ; Done in a loop; runs far too fast on actual hardware
         ld b, 0x80
@@ -37,6 +43,7 @@ _:      xor a
         jr nz, -_
         djnz -_
     pop bc
+#endif
     pop af
     ret
 
@@ -122,6 +129,10 @@ getKey:
     ret
 _:
 getKey_skipCheck:
+#ifdef PICO80
+    in a, (PORT_KEYPAD)
+    ret
+#else
     push bc
     push af
     push de
@@ -214,3 +225,4 @@ getKey_skipCheck:
     .db 0x00, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30
 .keygroup7:
     .db 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38
+#endif

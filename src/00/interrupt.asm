@@ -33,7 +33,7 @@ sysInterrupt:
     push bc
     push de
     push hl
-
+    
 #ifdef USB
     jp usbInterrupt
 interruptResume:
@@ -77,7 +77,7 @@ intHandleON:
     out (PORT_INT_MASK), a
     set BIT_INT_ON, a
     out (PORT_INT_MASK), a
-
+    
     ; Check for special keycodes
     jp handleKeyboard
     
